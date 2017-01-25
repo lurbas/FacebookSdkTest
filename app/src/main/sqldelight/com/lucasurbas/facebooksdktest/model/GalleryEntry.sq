@@ -1,0 +1,14 @@
+CREATE TABLE galleryEntry (
+    _id TEXT NOT NULL PRIMARY KEY,
+    uri TEXT NOT NULL,
+    is_shared INTEGER NOT NULL
+);
+
+select_all:
+SELECT *
+FROM galleryEntry;
+
+select_by_id:
+SELECT *
+FROM galleryEntry
+where galleryEntry._id = ?;
