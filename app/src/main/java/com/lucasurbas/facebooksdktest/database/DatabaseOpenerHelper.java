@@ -4,11 +4,11 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import model.GalleryEntry;
+import com.lucasurbas.facebooksdktest.model.GalleryItem;
 
 
 /**
- * Created by Lucas on 19/06/16.
+ * Created by Lucas on 25/01/2017.
  */
 public class DatabaseOpenerHelper extends SQLiteOpenHelper {
 
@@ -21,7 +21,7 @@ public class DatabaseOpenerHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(GalleryEntry.CREATE_TABLE);
+        db.execSQL(GalleryItem.CREATE_TABLE);
 
     }
 

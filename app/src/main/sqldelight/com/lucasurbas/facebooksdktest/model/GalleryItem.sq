@@ -1,4 +1,4 @@
-CREATE TABLE galleryEntry (
+CREATE TABLE galleryItem (
     _id TEXT NOT NULL PRIMARY KEY,
     uri TEXT NOT NULL,
     is_shared INTEGER NOT NULL
@@ -6,9 +6,9 @@ CREATE TABLE galleryEntry (
 
 select_all:
 SELECT *
-FROM galleryEntry;
+FROM galleryItem;
 
 select_by_id:
 SELECT *
-FROM galleryEntry
-where galleryEntry._id = ?;
+FROM galleryItem
+where galleryItem._id = ?;
