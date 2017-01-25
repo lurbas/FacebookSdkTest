@@ -1,5 +1,7 @@
 package com.lucasurbas.facebooksdktest.ui.gallery;
 
+import android.net.Uri;
+import android.support.v4.content.FileProvider;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,8 +9,11 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.lucasurbas.facebooksdktest.R;
+import com.lucasurbas.facebooksdktest.constants.Constants;
 import com.lucasurbas.facebooksdktest.model.GalleryItem;
+import com.squareup.picasso.Picasso;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +29,7 @@ import rx.subjects.PublishSubject;
 public class GalleryItemsAdapter extends RecyclerView.Adapter<GalleryItemsAdapter.ViewHolder> {
 
     private List<GalleryItem> galleryItems;
-    private final PublishSubject<GalleryItem> onClickSubject = PublishSubject.create();
+    private final PublishSubject<GalleryItem> onClickSubject;
 
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -32,18 +37,37 @@ public class GalleryItemsAdapter extends RecyclerView.Adapter<GalleryItemsAdapte
         @BindView(R.id.item_view_gallery_item__image) ImageView image;
         @BindView(R.id.item_view_gallery_item__shared) ImageView shared;
 
+        Picasso picasso;
+
         public ViewHolder(View view) {
             super(view);
             ButterKnife.bind(this, view);
+            Picasso.Builder builder = new Picasso.Builder(view.getContext());
+            builder.listener(new Picasso.Listener() {
+                @Override
+                public void onImageLoadFailed(Picasso picasso, Uri uri, Exception exception) {
+                    exception.printStackTrace();
+                }
+            });
+            picasso = builder.build();
+            picasso.setLoggingEnabled(true);
         }
 
         public void setItem(GalleryItem item) {
+            File photoFile = new File(item.path());
+            Uri photoURI = FileProvider.getUriForFile(itemView.getContext(),
+                    Constants.FILE_PROVIDER_AUTHORITY,
+                    photoFile);
             shared.setVisibility(item.isShared() ? View.VISIBLE : View.GONE);
+            picasso.load(photoURI)
+                    .fit()
+                    .into(image);
         }
     }
 
     public GalleryItemsAdapter() {
-        this.galleryItems = new ArrayList<GalleryItem>();
+        this.galleryItems = new ArrayList<>();
+        this.onClickSubject = PublishSubject.create();
     }
 
     @Override
@@ -70,7 +94,7 @@ public class GalleryItemsAdapter extends RecyclerView.Adapter<GalleryItemsAdapte
         notifyDataSetChanged();
     }
 
-    public Observable<GalleryItem> getItemClickObservable(){
+    public Observable<GalleryItem> getItemClickObservable() {
         return onClickSubject.asObservable();
     }
 

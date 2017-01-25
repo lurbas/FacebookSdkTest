@@ -12,11 +12,14 @@ import com.squareup.sqldelight.RowMapper;
 @AutoValue
 public abstract class GalleryItem implements GalleryItemModel {
 
+    public static final long NOT_SHARED = 0;
+    public static final long SHARED = 1;
+
     public static GalleryItem create(String _id, String uri, boolean isShared){
-        return new AutoValue_GalleryItem(_id, uri, isShared ? 1 : 0);
+        return new AutoValue_GalleryItem(_id, uri, isShared ? SHARED : NOT_SHARED);
     }
 
-    private static final Factory<GalleryItem> FACTORY = new Factory<>(new Creator<GalleryItem>() {
+    public static final Factory<GalleryItem> FACTORY = new Factory<>(new Creator<GalleryItem>() {
         @Override
         public GalleryItem create(@NonNull String _id, String uri, long isShared) {
             return new AutoValue_GalleryItem(_id, uri, isShared);
@@ -28,6 +31,6 @@ public abstract class GalleryItem implements GalleryItemModel {
     public static final RowMapper<GalleryItem> SELECT_BY_ID_MAPPER = FACTORY.select_by_idMapper();
 
     public boolean isShared(){
-        return is_shared() == 1;
+        return is_shared() == SHARED;
     }
 }

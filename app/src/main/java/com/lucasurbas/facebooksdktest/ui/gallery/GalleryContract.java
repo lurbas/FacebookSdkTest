@@ -1,5 +1,7 @@
 package com.lucasurbas.facebooksdktest.ui.gallery;
 
+import android.os.Bundle;
+
 import com.lucasurbas.facebooksdktest.model.GalleryItem;
 import com.lucasurbas.facebooksdktest.ui.util.BaseNavigator;
 import com.lucasurbas.facebooksdktest.ui.util.BasePresenter;
@@ -15,7 +17,7 @@ public interface GalleryContract {
 
     interface Navigator extends BaseNavigator {
 
-        void openCamera();
+        String openCamera();
 
         void openGalleryItemDetails(String itemId);
 
@@ -32,12 +34,17 @@ public interface GalleryContract {
 
     interface Presenter extends BasePresenter<View> {
 
+        Bundle saveState();
+
+        void restoreState(Bundle bundle);
+
         void takePhoto();
 
         void loadGalleryItems();
 
         void galleryItemClick(GalleryItem item);
 
+        void savePictureAsGalleryItem();
     }
 
 }
