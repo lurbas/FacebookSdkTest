@@ -1,4 +1,4 @@
-package com.lucasurbas.facebooksdktest.ui;
+package com.lucasurbas.facebooksdktest.ui.util;
 
 /**
  * Created by Lucas on 25/01/2017.

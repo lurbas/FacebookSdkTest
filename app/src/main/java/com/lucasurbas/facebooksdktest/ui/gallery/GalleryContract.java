@@ -1,9 +1,9 @@
 package com.lucasurbas.facebooksdktest.ui.gallery;
 
 import com.lucasurbas.facebooksdktest.model.GalleryItem;
-import com.lucasurbas.facebooksdktest.ui.BaseNavigator;
-import com.lucasurbas.facebooksdktest.ui.BasePresenter;
-import com.lucasurbas.facebooksdktest.ui.BaseView;
+import com.lucasurbas.facebooksdktest.ui.util.BaseNavigator;
+import com.lucasurbas.facebooksdktest.ui.util.BasePresenter;
+import com.lucasurbas.facebooksdktest.ui.util.BaseView;
 
 import java.util.List;
 
@@ -36,7 +36,7 @@ public interface GalleryContract {
 
         void loadGalleryItems();
 
-        void startGalleryItemDetails(String itemId);
+        void galleryItemClick(GalleryItem item);
 
     }
 

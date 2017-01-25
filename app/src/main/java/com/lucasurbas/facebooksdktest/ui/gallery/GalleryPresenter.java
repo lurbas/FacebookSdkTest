@@ -90,7 +90,7 @@ public class GalleryPresenter implements GalleryContract.Presenter {
     }
 
     @Override
-    public void startGalleryItemDetails(String itemId) {
-        navigator.openGalleryItemDetails(itemId);
+    public void galleryItemClick(GalleryItem item) {
+        navigator.openGalleryItemDetails(item._id());
     }
 }

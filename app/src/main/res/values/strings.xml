@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">FacebookSdkTest</string>
+    <string name="app_name">Awesome!</string>
+
+    <string name="activity_gallery__empty_state">No items.\nTake your first photo!</string>
 </resources>
