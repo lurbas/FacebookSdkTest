@@ -10,6 +10,7 @@ import com.lucasurbas.facebooksdktest.ui.gallery.GalleryPresenter;
 
 import dagger.Module;
 import dagger.Provides;
+import pl.charmas.android.reactivelocation.ReactiveLocationProvider;
 
 /**
  * Created by Lucas on 25/01/2017.
@@ -44,7 +45,13 @@ public class GalleryModule {
 
     @Provides
     @ActivityScope
-    GalleryActivity proviGalleryActivity(){
+    GalleryActivity provideGalleryActivity(){
         return galleryActivity;
+    }
+
+    @Provides
+    @ActivityScope
+    ReactiveLocationProvider provideReactiveLocationProvider(){
+        return new ReactiveLocationProvider(galleryActivity);
     }
 }

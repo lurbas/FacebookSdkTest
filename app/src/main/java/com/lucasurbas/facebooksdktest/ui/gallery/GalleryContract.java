@@ -30,6 +30,8 @@ public interface GalleryContract {
         void showEmptyScreen();
 
         void showToast(String message);
+
+        void showPublishDialog(GalleryItem item);
     }
 
     interface Presenter extends BasePresenter<View> {
@@ -45,6 +47,8 @@ public interface GalleryContract {
         void galleryItemClick(GalleryItem item);
 
         void savePictureAsGalleryItem();
+
+        void publishOnFacebook(GalleryItem item);
     }
 
 }

@@ -1,12 +1,16 @@
 package com.lucasurbas.facebooksdktest.ui.gallery;
 
+import android.Manifest;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.lucasurbas.facebooksdktest.R;
 import com.lucasurbas.facebooksdktest.constants.Constants;
 import com.lucasurbas.facebooksdktest.injection.app.ApplicationComponent;
@@ -15,6 +19,7 @@ import com.lucasurbas.facebooksdktest.injection.gallery.GalleryModule;
 import com.lucasurbas.facebooksdktest.model.GalleryItem;
 import com.lucasurbas.facebooksdktest.ui.util.BaseActivity;
 import com.lucasurbas.facebooksdktest.ui.util.ViewUtils;
+import com.tbruyelle.rxpermissions.RxPermissions;
 
 import java.util.List;
 
@@ -133,5 +138,32 @@ public class GalleryActivity extends BaseActivity implements GalleryContract.Vie
     @Override
     public void showToast(String message) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showPublishDialog(final GalleryItem item) {
+        new MaterialDialog.Builder(this)
+                .title(R.string.activity_gallery__publish_title)
+                .content(R.string.activity_gallery__publish_content)
+                .positiveText(R.string.dialog_agree)
+                .negativeText(R.string.dialog_disagree)
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        RxPermissions rxPermissions = new RxPermissions(GalleryActivity.this);
+                        rxPermissions.request(Manifest.permission.ACCESS_FINE_LOCATION)
+                                .subscribe(new Action1<Boolean>() {
+                                    @Override
+                                    public void call(Boolean granted) {
+                                        if (granted) {
+                                            presenter.publishOnFacebook(item);
+                                        }else{
+                                            showToast("no permissions");
+                                        }
+                                    }
+                                });
+                    }
+                })
+                .show();
     }
 }

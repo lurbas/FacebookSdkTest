@@ -2,4 +2,9 @@
     <string name="app_name">Awesome!</string>
 
     <string name="activity_gallery__empty_state">No items.\nTake your first photo!</string>
+    <string name="activity_gallery__publish_title">Show to the world?</string>
+    <string name="activity_gallery__publish_content">Do you want to share this image on Facebook?</string>
+
+    <string name="dialog_agree">Yes</string>
+    <string name="dialog_disagree">Cancel</string>
 </resources>
