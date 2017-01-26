@@ -24,6 +24,7 @@ import com.lucasurbas.facebooksdktest.model.GalleryItem;
 import com.squareup.sqlbrite.BriteDatabase;
 import com.squareup.sqlbrite.QueryObservable;
 
+import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -42,7 +43,6 @@ import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
-import static android.R.attr.country;
 import static com.facebook.AccessToken.getCurrentAccessToken;
 
 /**
@@ -260,12 +260,10 @@ public class GalleryPresenter implements GalleryContract.Presenter {
                 if (view != null) {
                     view.showToast("Posted on Facebook!");
                 }
-                database.insert(GalleryItem.TABLE_NAME, GalleryItem.FACTORY.marshal()
-                                ._id(item._id())
+                database.update(GalleryItem.TABLE_NAME, GalleryItem.FACTORY.marshal()
                                 .post_id(result.getPostId())
-                                .path(item.path())
                                 .asContentValues(),
-                        SQLiteDatabase.CONFLICT_REPLACE);
+                        "_id = ?", item._id());
             }
 
             @Override

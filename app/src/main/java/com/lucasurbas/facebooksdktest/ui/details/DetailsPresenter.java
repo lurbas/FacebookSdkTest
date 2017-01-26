@@ -1,7 +1,6 @@
 package com.lucasurbas.facebooksdktest.ui.details;
 
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 
 import com.facebook.AccessToken;
 import com.facebook.FacebookRequestError;
@@ -115,12 +114,10 @@ public class DetailsPresenter implements DetailsContract.Presenter {
         ).executeAsync();
     }
 
-    private void deletePostId(GalleryItem galleryItem) {
-        database.insert(GalleryItem.TABLE_NAME, GalleryItem.FACTORY.marshal()
-                        ._id(galleryItem._id())
-                        .path(galleryItem.path())
+    private void deletePostId(GalleryItem item) {
+        database.update(GalleryItem.TABLE_NAME, GalleryItem.FACTORY.marshal()
                         .post_id(null)
                         .asContentValues(),
-                SQLiteDatabase.CONFLICT_REPLACE);
+                "_id = ?", item._id());
     }
 }

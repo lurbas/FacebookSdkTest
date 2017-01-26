@@ -11,4 +11,4 @@ FROM galleryItem;
 select_by_id:
 SELECT *
 FROM galleryItem
-where galleryItem._id = ?;
+WHERE galleryItem._id = ?;
