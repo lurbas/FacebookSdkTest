@@ -1,7 +1,5 @@
 package com.lucasurbas.facebooksdktest.ui.gallery;
 
-import android.net.Uri;
-import android.support.v4.content.FileProvider;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,7 +7,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.lucasurbas.facebooksdktest.R;
-import com.lucasurbas.facebooksdktest.constants.Constants;
 import com.lucasurbas.facebooksdktest.model.GalleryItem;
 import com.squareup.picasso.Picasso;
 
@@ -37,30 +34,20 @@ public class GalleryItemsAdapter extends RecyclerView.Adapter<GalleryItemsAdapte
         @BindView(R.id.item_view_gallery_item__image) ImageView image;
         @BindView(R.id.item_view_gallery_item__shared) ImageView shared;
 
-        Picasso picasso;
+        private Picasso picasso;
 
         public ViewHolder(View view) {
             super(view);
             ButterKnife.bind(this, view);
-            Picasso.Builder builder = new Picasso.Builder(view.getContext());
-            builder.listener(new Picasso.Listener() {
-                @Override
-                public void onImageLoadFailed(Picasso picasso, Uri uri, Exception exception) {
-                    exception.printStackTrace();
-                }
-            });
-            picasso = builder.build();
-            picasso.setLoggingEnabled(true);
+            picasso = Picasso.with(view.getContext());
         }
 
         public void setItem(GalleryItem item) {
             File photoFile = new File(item.path());
-            Uri photoURI = FileProvider.getUriForFile(itemView.getContext(),
-                    Constants.FILE_PROVIDER_AUTHORITY,
-                    photoFile);
             shared.setVisibility(item.post_id() != null ? View.VISIBLE : View.GONE);
-            picasso.load(photoURI)
+            picasso.load(photoFile)
                     .fit()
+                    .centerCrop()
                     .into(image);
         }
     }

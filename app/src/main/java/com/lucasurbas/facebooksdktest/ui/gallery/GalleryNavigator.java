@@ -7,6 +7,7 @@ import android.provider.MediaStore;
 import android.support.v4.content.FileProvider;
 
 import com.lucasurbas.facebooksdktest.constants.Constants;
+import com.lucasurbas.facebooksdktest.ui.details.DetailsActivity;
 import com.lucasurbas.facebooksdktest.ui.login.LoginActivity;
 
 import java.io.File;
@@ -39,7 +40,7 @@ public class GalleryNavigator implements GalleryContract.Navigator {
 
     @Override
     public void openGalleryItemDetails(String itemId) {
-
+        galleryActivity.startActivity(DetailsActivity.getIntent(galleryActivity, itemId));
     }
 
     @Override
