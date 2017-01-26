@@ -62,11 +62,13 @@ public class GalleryActivity extends BaseActivity implements GalleryContract.Vie
         ButterKnife.bind(this);
         setupRecyclerView();
 
-        presenter.attachView(this);
-        if (savedInstanceState != null) {
-            presenter.restoreState(savedInstanceState.getBundle(KEY_PRESENTER_STATE));
+        if (presenter.checkFacebookAccess()) {
+            presenter.attachView(this);
+            if (savedInstanceState != null) {
+                presenter.restoreState(savedInstanceState.getBundle(KEY_PRESENTER_STATE));
+            }
+            presenter.loadGalleryItems();
         }
-        presenter.loadGalleryItems();
     }
 
     private void setupRecyclerView() {
@@ -157,8 +159,8 @@ public class GalleryActivity extends BaseActivity implements GalleryContract.Vie
                                     public void call(Boolean granted) {
                                         if (granted) {
                                             presenter.publishOnFacebook(item);
-                                        }else{
-                                            showToast("no permissions");
+                                        } else {
+                                            showToast("Permission Denied");
                                         }
                                     }
                                 });

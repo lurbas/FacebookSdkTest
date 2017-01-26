@@ -21,6 +21,9 @@ public interface GalleryContract {
 
         void openGalleryItemDetails(String itemId);
 
+        void openLoginScreen();
+
+        void finish();
     }
 
     interface View extends BaseView {
@@ -49,6 +52,8 @@ public interface GalleryContract {
         void savePictureAsGalleryItem();
 
         void publishOnFacebook(GalleryItem item);
+
+        boolean checkFacebookAccess();
     }
 
 }

@@ -3,6 +3,7 @@ package com.lucasurbas.facebooksdktest.app;
 import android.app.Application;
 import android.content.Context;
 
+import com.facebook.FacebookSdk;
 import com.lucasurbas.facebooksdktest.BuildConfig;
 import com.lucasurbas.facebooksdktest.injection.app.ApplicationComponent;
 import com.lucasurbas.facebooksdktest.injection.app.ApplicationModule;
@@ -22,6 +23,7 @@ public class AwesomeApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        FacebookSdk.sdkInitialize(getApplicationContext());
 
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree());

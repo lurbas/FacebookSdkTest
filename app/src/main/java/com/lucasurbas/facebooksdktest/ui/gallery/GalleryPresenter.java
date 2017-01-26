@@ -7,6 +7,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.RequiresPermission;
 
+import com.facebook.AccessToken;
 import com.google.android.gms.location.LocationRequest;
 import com.lucasurbas.facebooksdktest.model.GalleryItem;
 import com.squareup.sqlbrite.BriteDatabase;
@@ -35,7 +36,7 @@ import rx.schedulers.Schedulers;
 public class GalleryPresenter implements GalleryContract.Presenter {
 
     private static final String KEY_PHOTO_PATH = "key_photo_path";
-    private static final int LOCATION_TIMEOUT_IN_SECONDS = 5;
+    private static final int LOCATION_TIMEOUT_IN_SECONDS = 6;
 
     private GalleryContract.View view;
     private GalleryContract.Navigator navigator;
@@ -179,7 +180,7 @@ public class GalleryPresenter implements GalleryContract.Presenter {
                     public void call(Throwable throwable) {
                         if (throwable instanceof TimeoutException) {
                             if (view != null) {
-                                view.showToast("Timeout");
+                                view.showToast("Timeout getting location");
                             }
                         } else {
                             if (view != null) {
@@ -195,5 +196,15 @@ public class GalleryPresenter implements GalleryContract.Presenter {
                         }
                     }
                 });
+    }
+
+    @Override
+    public boolean checkFacebookAccess() {
+        boolean hasAccessToken = AccessToken.getCurrentAccessToken() != null;
+        if (!hasAccessToken) {
+            navigator.openLoginScreen();
+            navigator.finish();
+        }
+        return hasAccessToken;
     }
 }

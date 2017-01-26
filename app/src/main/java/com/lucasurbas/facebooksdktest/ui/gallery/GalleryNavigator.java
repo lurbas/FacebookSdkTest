@@ -7,6 +7,7 @@ import android.provider.MediaStore;
 import android.support.v4.content.FileProvider;
 
 import com.lucasurbas.facebooksdktest.constants.Constants;
+import com.lucasurbas.facebooksdktest.ui.login.LoginActivity;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,6 +40,17 @@ public class GalleryNavigator implements GalleryContract.Navigator {
     @Override
     public void openGalleryItemDetails(String itemId) {
 
+    }
+
+    @Override
+    public void openLoginScreen() {
+        galleryActivity.startActivity(LoginActivity.getIntent(galleryActivity));
+        galleryActivity.overridePendingTransition(0, 0);
+    }
+
+    @Override
+    public void finish() {
+        galleryActivity.finish();
     }
 
     private File createImageFile() throws IOException {
