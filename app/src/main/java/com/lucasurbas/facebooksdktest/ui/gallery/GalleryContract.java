@@ -35,6 +35,10 @@ public interface GalleryContract {
         void showToast(String message);
 
         void showPublishDialog(GalleryItem item);
+
+        void askForPublishPermission(GalleryItem item);
+
+        void askForLocationPermission(GalleryItem item);
     }
 
     interface Presenter extends BasePresenter<View> {
@@ -51,7 +55,9 @@ public interface GalleryContract {
 
         void savePictureAsGalleryItem();
 
-        void publishOnFacebook(GalleryItem item);
+        void tryPublish(GalleryItem item);
+
+        void publish(GalleryItem item);
 
         boolean checkFacebookAccess();
 

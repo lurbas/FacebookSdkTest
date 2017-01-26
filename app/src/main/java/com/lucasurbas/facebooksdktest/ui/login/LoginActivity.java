@@ -39,7 +39,7 @@ public class LoginActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         callbackManager = CallbackManager.Factory.create();
-        loginButton.setReadPermissions("public_profile");
+//        loginButton.setPublishPermissions("publish_actions");
 
         // Callback registration
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {

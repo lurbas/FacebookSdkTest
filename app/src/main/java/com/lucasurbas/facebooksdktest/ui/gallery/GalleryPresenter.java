@@ -2,19 +2,31 @@ package com.lucasurbas.facebooksdktest.ui.gallery;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Address;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.RequiresPermission;
 
 import com.facebook.AccessToken;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.Profile;
 import com.facebook.login.LoginManager;
+import com.facebook.share.ShareApi;
+import com.facebook.share.Sharer;
+import com.facebook.share.model.SharePhoto;
+import com.facebook.share.model.SharePhotoContent;
 import com.google.android.gms.location.LocationRequest;
+import com.lucasurbas.facebooksdktest.constants.Constants;
 import com.lucasurbas.facebooksdktest.model.GalleryItem;
 import com.squareup.sqlbrite.BriteDatabase;
 import com.squareup.sqlbrite.QueryObservable;
 
 import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -29,6 +41,9 @@ import rx.functions.Action0;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
+
+import static android.R.attr.country;
+import static com.facebook.AccessToken.getCurrentAccessToken;
 
 /**
  * Created by Lucas on 25/01/2017.
@@ -126,7 +141,7 @@ public class GalleryPresenter implements GalleryContract.Presenter {
 
     @Override
     public void galleryItemClick(GalleryItem item) {
-        if (item.isShared()) {
+        if (item.post_id() != null) {
             navigator.openGalleryItemDetails(item._id());
         } else if (view != null) {
             view.showPublishDialog(item);
@@ -135,19 +150,33 @@ public class GalleryPresenter implements GalleryContract.Presenter {
 
     @Override
     public void savePictureAsGalleryItem() {
+        Profile facebookProfile = Profile.getCurrentProfile();
+        if (view != null) {
+            view.showToast(String.format(Locale.ROOT, "You look awesome, %s!", facebookProfile.getName()));
+        }
         database.insert(GalleryItem.TABLE_NAME, GalleryItem.FACTORY.marshal()
                         ._id(UUID.randomUUID().toString())
-                        .is_shared(GalleryItem.NOT_SHARED)
                         .path(photoPath)
                         .asContentValues(),
                 SQLiteDatabase.CONFLICT_REPLACE);
+    }
+
+    public void tryPublish(final GalleryItem item) {
+        Set<String> permission = AccessToken.getCurrentAccessToken().getPermissions();
+        if (view != null) {
+            if (permission.contains(Constants.PUBLISH_PERMISSIONS)) {
+                view.askForLocationPermission(item);
+            } else {
+                view.askForPublishPermission(item);
+            }
+        }
     }
 
     @RequiresPermission(
             anyOf = {"android.permission.ACCESS_COARSE_LOCATION", "android.permission.ACCESS_FINE_LOCATION"}
     )
     @Override
-    public void publishOnFacebook(GalleryItem item) {
+    public void publish(final GalleryItem item) {
 
         LocationRequest req = LocationRequest.create()
                 .setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY)
@@ -171,9 +200,14 @@ public class GalleryPresenter implements GalleryContract.Presenter {
                 .subscribe(new Action1<List<Address>>() {
                     @Override
                     public void call(List<Address> addressList) {
-                        if (view != null && !addressList.isEmpty()) {
+                        if (!addressList.isEmpty()) {
                             Address address = addressList.get(0);
-                            view.showToast("Adress: " + address.getLocality() + ", country: " + address.getCountryName());
+                            if (view != null) {
+                                view.showToast("Location: " + address.getLocality() + ", " + address.getCountryName());
+                            }
+                            publishOnFacebook(item, address.getLocality(), address.getLocality());
+                        } else if (view != null) {
+                            view.showToast("Address empty");
                         }
                     }
                 }, new Action1<Throwable>() {
@@ -192,16 +226,90 @@ public class GalleryPresenter implements GalleryContract.Presenter {
                 }, new Action0() {
                     @Override
                     public void call() {
-                        if (view != null) {
-                            view.showToast("Completed");
-                        }
+//                        if (view != null) {
+//                            view.showToast("Completed");
+//                        }
                     }
                 });
     }
 
+    private void publishOnFacebook(final GalleryItem item, String city, String country) {
+        final Bitmap image = getBitmap(item.path());
+        if (image == null) {
+            if (view != null) {
+                view.showToast("Error decoding bitmap");
+            }
+            return;
+        }
+
+        if (view != null) {
+            view.showToast("Start sharing!");
+        }
+
+        SharePhoto photo = new SharePhoto.Builder()
+                .setBitmap(image)
+                .setUserGenerated(true)
+                .setCaption(String.format(Locale.ROOT, "See how cool I am! Made in %s, %s", city, country))
+                .build();
+        SharePhotoContent content = new SharePhotoContent.Builder()
+                .addPhoto(photo)
+                .build();
+        ShareApi.share(content, new FacebookCallback<Sharer.Result>() {
+            @Override
+            public void onSuccess(Sharer.Result result) {
+                if (view != null) {
+                    view.showToast("Posted on Facebook!");
+                }
+                database.insert(GalleryItem.TABLE_NAME, GalleryItem.FACTORY.marshal()
+                                ._id(item._id())
+                                .post_id(result.getPostId())
+                                .path(item.path())
+                                .asContentValues(),
+                        SQLiteDatabase.CONFLICT_REPLACE);
+            }
+
+            @Override
+            public void onCancel() {
+                if (view != null) {
+                    view.showToast("Cancel posting on Facebook");
+                }
+            }
+
+            @Override
+            public void onError(FacebookException error) {
+                if (view != null) {
+                    view.showToast("Error posting on Facebook: " + error.getMessage());
+                }
+            }
+        });
+    }
+
+    private Bitmap getBitmap(String path) {
+        // Get the dimensions of the View
+        int targetW = 800;
+        int targetH = 800;
+
+        // Get the dimensions of the bitmap
+        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+        bmOptions.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(path, bmOptions);
+        int photoW = bmOptions.outWidth;
+        int photoH = bmOptions.outHeight;
+
+        // Determine how much to scale down the image
+        int scaleFactor = Math.min(photoW / targetW, photoH / targetH);
+
+        // Decode the image file into a Bitmap sized to fill the View
+        bmOptions.inJustDecodeBounds = false;
+        bmOptions.inSampleSize = scaleFactor;
+        bmOptions.inPurgeable = true;
+
+        return BitmapFactory.decodeFile(path, bmOptions);
+    }
+
     @Override
     public boolean checkFacebookAccess() {
-        boolean hasAccessToken = AccessToken.getCurrentAccessToken() != null;
+        boolean hasAccessToken = getCurrentAccessToken() != null;
         if (!hasAccessToken) {
             navigator.openLoginScreen();
             navigator.finish();

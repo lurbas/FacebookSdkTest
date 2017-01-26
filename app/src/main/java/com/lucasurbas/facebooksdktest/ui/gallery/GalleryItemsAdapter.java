@@ -58,7 +58,7 @@ public class GalleryItemsAdapter extends RecyclerView.Adapter<GalleryItemsAdapte
             Uri photoURI = FileProvider.getUriForFile(itemView.getContext(),
                     Constants.FILE_PROVIDER_AUTHORITY,
                     photoFile);
-            shared.setVisibility(item.isShared() ? View.VISIBLE : View.GONE);
+            shared.setVisibility(item.post_id() != null ? View.VISIBLE : View.GONE);
             picasso.load(photoURI)
                     .fit()
                     .into(image);

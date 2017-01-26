@@ -14,6 +14,11 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.login.LoginManager;
+import com.facebook.login.LoginResult;
 import com.lucasurbas.facebooksdktest.R;
 import com.lucasurbas.facebooksdktest.constants.Constants;
 import com.lucasurbas.facebooksdktest.injection.app.ApplicationComponent;
@@ -24,6 +29,7 @@ import com.lucasurbas.facebooksdktest.ui.util.BaseActivity;
 import com.lucasurbas.facebooksdktest.ui.util.ViewUtils;
 import com.tbruyelle.rxpermissions.RxPermissions;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -48,6 +54,7 @@ public class GalleryActivity extends BaseActivity implements GalleryContract.Vie
 
     private GalleryItemsAdapter adapter;
     private Subscription subscription;
+    private CallbackManager callbackManager;
 
     public static Intent getIntent(Context context) {
         return new Intent(context, GalleryActivity.class);
@@ -147,6 +154,9 @@ public class GalleryActivity extends BaseActivity implements GalleryContract.Vie
         if (resultCode == RESULT_OK && requestCode == Constants.REQUEST_TAKE_PHOTO) {
             presenter.savePictureAsGalleryItem();
         }
+        if (callbackManager != null) {
+            callbackManager.onActivityResult(requestCode, resultCode, data);
+        }
     }
 
     @Override
@@ -162,7 +172,7 @@ public class GalleryActivity extends BaseActivity implements GalleryContract.Vie
 
     @Override
     public void showToast(String message) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -175,20 +185,51 @@ public class GalleryActivity extends BaseActivity implements GalleryContract.Vie
                 .onPositive(new MaterialDialog.SingleButtonCallback() {
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        RxPermissions rxPermissions = new RxPermissions(GalleryActivity.this);
-                        rxPermissions.request(Manifest.permission.ACCESS_FINE_LOCATION)
-                                .subscribe(new Action1<Boolean>() {
-                                    @Override
-                                    public void call(Boolean granted) {
-                                        if (granted) {
-                                            presenter.publishOnFacebook(item);
-                                        } else {
-                                            showToast("Permission Denied");
-                                        }
-                                    }
-                                });
+                        presenter.tryPublish(item);
                     }
                 })
                 .show();
+    }
+
+    @Override
+    public void askForPublishPermission(final GalleryItem item) {
+        callbackManager = CallbackManager.Factory.create();
+        LoginManager.getInstance().registerCallback(callbackManager,
+                new FacebookCallback<LoginResult>() {
+                    @Override
+                    public void onSuccess(LoginResult loginResult) {
+                        presenter.tryPublish(item);
+                        askForLocationPermission(item);
+                    }
+
+                    @Override
+                    public void onCancel() {
+                        showToast("Publish Permission Denied");
+                    }
+
+                    @Override
+                    public void onError(FacebookException exception) {
+                        showToast("Publish Permission Denied");
+                    }
+                });
+        LoginManager.getInstance().logInWithPublishPermissions(
+                this,
+                Arrays.asList(Constants.PUBLISH_PERMISSIONS));
+    }
+
+    @Override
+    public void askForLocationPermission(final GalleryItem item) {
+        RxPermissions rxPermissions = new RxPermissions(GalleryActivity.this);
+        rxPermissions.request(Manifest.permission.ACCESS_FINE_LOCATION)
+                .subscribe(new Action1<Boolean>() {
+                    @Override
+                    public void call(Boolean granted) {
+                        if (granted) {
+                            presenter.publish(item);
+                        } else {
+                            showToast("Location Permission Denied");
+                        }
+                    }
+                });
     }
 }
