@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
@@ -114,6 +116,22 @@ public class GalleryActivity extends BaseActivity implements GalleryContract.Vie
         presenter.detachView();
         if (subscription != null && !subscription.isUnsubscribed()) {
             subscription.unsubscribe();
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.gallery, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.menu_gallery__logout) {
+            presenter.logout();
+            return true;
+        } else {
+            return super.onOptionsItemSelected(item);
         }
     }
 

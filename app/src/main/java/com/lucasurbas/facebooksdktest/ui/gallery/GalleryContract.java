@@ -54,6 +54,8 @@ public interface GalleryContract {
         void publishOnFacebook(GalleryItem item);
 
         boolean checkFacebookAccess();
+
+        void logout();
     }
 
 }

@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.RequiresPermission;
 
 import com.facebook.AccessToken;
+import com.facebook.login.LoginManager;
 import com.google.android.gms.location.LocationRequest;
 import com.lucasurbas.facebooksdktest.model.GalleryItem;
 import com.squareup.sqlbrite.BriteDatabase;
@@ -206,5 +207,12 @@ public class GalleryPresenter implements GalleryContract.Presenter {
             navigator.finish();
         }
         return hasAccessToken;
+    }
+
+    @Override
+    public void logout() {
+        LoginManager.getInstance().logOut();
+        navigator.openLoginScreen();
+        navigator.finish();
     }
 }
