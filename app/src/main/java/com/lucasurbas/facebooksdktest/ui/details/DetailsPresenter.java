@@ -7,7 +7,8 @@ import com.facebook.FacebookRequestError;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.HttpMethod;
-import com.lucasurbas.facebooksdktest.model.FacebookResponse;
+import com.google.gson.Gson;
+import com.lucasurbas.facebooksdktest.model.facebook.FbPostDetailsResponse;
 import com.lucasurbas.facebooksdktest.model.GalleryItem;
 import com.squareup.sqlbrite.BriteDatabase;
 import com.squareup.sqlbrite.QueryObservable;
@@ -32,11 +33,13 @@ public class DetailsPresenter implements DetailsContract.Presenter {
     private DetailsContract.View view;
     private BriteDatabase database;
     private Subscription subscription;
+    private Gson gson;
 
     @Inject
-    public DetailsPresenter(DetailsContract.Navigator navigator, BriteDatabase database) {
+    public DetailsPresenter(DetailsContract.Navigator navigator, BriteDatabase database, Gson gson) {
         this.navigator = navigator;
         this.database = database;
+        this.gson = gson;
     }
 
     @Override
@@ -104,7 +107,7 @@ public class DetailsPresenter implements DetailsContract.Presenter {
                                 view.showToast(error.getErrorUserMessage());
                             }
                         } else {
-                            FacebookResponse facebookResponse = new FacebookResponse(response.getRawResponse());
+                            FbPostDetailsResponse facebookResponse = gson.fromJson(response.getRawResponse(), FbPostDetailsResponse.class);
                             if (view != null) {
                                 view.showCounters(facebookResponse.getLikesCount(), facebookResponse.getCommentsCount());
                             }
@@ -118,6 +121,6 @@ public class DetailsPresenter implements DetailsContract.Presenter {
         database.update(GalleryItem.TABLE_NAME, GalleryItem.FACTORY.marshal()
                         .post_id(null)
                         .asContentValues(),
-                "_id = ?", item._id());
+                GalleryItem.WHERE_BY_ID, item._id());
     }
 }

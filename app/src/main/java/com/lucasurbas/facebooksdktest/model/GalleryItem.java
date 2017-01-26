@@ -12,6 +12,8 @@ import com.squareup.sqldelight.RowMapper;
 @AutoValue
 public abstract class GalleryItem implements GalleryItemModel {
 
+    public static final String WHERE_BY_ID = "_id = ?";
+
     public static GalleryItem create(String _id, String uri, String postId){
         return new AutoValue_GalleryItem(_id, uri, postId);
     }

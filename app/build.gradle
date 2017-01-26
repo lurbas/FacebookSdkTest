@@ -54,9 +54,6 @@ dependencies {
     // SQLBrite
     compile 'com.squareup.sqlbrite:sqlbrite:0.6.3'
 
-    // Logging
-    compile 'com.jakewharton.timber:timber:4.1.2'
-
     // RxJava
     compile 'io.reactivex:rxjava:1.1.6'
     compile 'io.reactivex:rxandroid:1.2.1'
@@ -76,6 +73,9 @@ dependencies {
 
     // Facebook
     compile 'com.facebook.android:facebook-android-sdk:[4,5)'
+
+    // Parsing
+    compile 'com.google.code.gson:gson:2.8.0'
 
     testCompile 'junit:junit:4.12'
 }

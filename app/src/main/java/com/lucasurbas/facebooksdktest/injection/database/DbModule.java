@@ -2,6 +2,7 @@ package com.lucasurbas.facebooksdktest.injection.database;
 
 import android.app.Application;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import com.lucasurbas.facebooksdktest.database.DatabaseOpenerHelper;
 import com.squareup.sqlbrite.BriteDatabase;
@@ -12,7 +13,6 @@ import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
 import rx.schedulers.Schedulers;
-import timber.log.Timber;
 
 /**
  * Created by Lucas on 25/01/2017.
@@ -32,7 +32,7 @@ public class DbModule {
         return SqlBrite.create(new SqlBrite.Logger() {
             @Override
             public void log(String message) {
-                Timber.tag("Database").v(message);
+                Log.v("DATABASE", message);
             }
         });
     }

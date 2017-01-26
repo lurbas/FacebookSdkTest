@@ -263,7 +263,7 @@ public class GalleryPresenter implements GalleryContract.Presenter {
                 database.update(GalleryItem.TABLE_NAME, GalleryItem.FACTORY.marshal()
                                 .post_id(result.getPostId())
                                 .asContentValues(),
-                        "_id = ?", item._id());
+                        GalleryItem.WHERE_BY_ID, item._id());
             }
 
             @Override

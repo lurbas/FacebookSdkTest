@@ -2,6 +2,7 @@ package com.lucasurbas.facebooksdktest.injection.app;
 
 import android.app.Application;
 
+import com.google.gson.Gson;
 import com.lucasurbas.facebooksdktest.injection.database.DbModule;
 import com.squareup.sqlbrite.BriteDatabase;
 
@@ -22,5 +23,7 @@ public interface ApplicationComponent {
     Application getApplication();
 
     BriteDatabase getDataBase();
+
+    Gson getGson();
 
 }
