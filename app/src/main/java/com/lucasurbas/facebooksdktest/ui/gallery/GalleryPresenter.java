@@ -205,7 +205,7 @@ public class GalleryPresenter implements GalleryContract.Presenter {
                             if (view != null) {
                                 view.showToast("Location: " + address.getLocality() + ", " + address.getCountryName());
                             }
-                            publishOnFacebook(item, address.getLocality(), address.getLocality());
+                            publishOnFacebook(item, address.getLocality(), address.getCountryName());
                         } else if (view != null) {
                             view.showToast("Address empty");
                         }

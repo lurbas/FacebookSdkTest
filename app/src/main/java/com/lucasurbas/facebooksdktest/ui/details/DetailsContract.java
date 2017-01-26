@@ -10,12 +10,17 @@ import com.lucasurbas.facebooksdktest.ui.util.BaseView;
 
 public interface DetailsContract {
 
+    interface Navigator {
+        void finish();
+    }
+
     interface View extends BaseView {
 
         void showGalleryItem(GalleryItem galleryItem);
 
         void showToast(String message);
 
+        void showCounters(int likesCount, int commentsCount);
     }
 
     interface Presenter extends BasePresenter<DetailsContract.View> {

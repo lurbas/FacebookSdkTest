@@ -5,6 +5,7 @@ import android.content.Context;
 import com.lucasurbas.facebooksdktest.injection.ActivityScope;
 import com.lucasurbas.facebooksdktest.ui.details.DetailsActivity;
 import com.lucasurbas.facebooksdktest.ui.details.DetailsContract;
+import com.lucasurbas.facebooksdktest.ui.details.DetailsNavigator;
 import com.lucasurbas.facebooksdktest.ui.details.DetailsPresenter;
 
 import dagger.Module;
@@ -27,6 +28,12 @@ public class DetailsModule {
     @ActivityScope
     DetailsContract.Presenter providePresenter(DetailsPresenter presenter) {
         return presenter;
+    }
+
+    @Provides
+    @ActivityScope
+    DetailsContract.Navigator provideNavigator(DetailsNavigator navigator) {
+        return navigator;
     }
 
     @Provides

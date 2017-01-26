@@ -1,10 +1,19 @@
 package com.lucasurbas.facebooksdktest.ui.details;
 
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 
+import com.facebook.AccessToken;
+import com.facebook.FacebookRequestError;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
+import com.facebook.HttpMethod;
+import com.lucasurbas.facebooksdktest.model.FacebookResponse;
 import com.lucasurbas.facebooksdktest.model.GalleryItem;
 import com.squareup.sqlbrite.BriteDatabase;
 import com.squareup.sqlbrite.QueryObservable;
+
+import java.util.Locale;
 
 import javax.inject.Inject;
 
@@ -20,12 +29,14 @@ import rx.schedulers.Schedulers;
 
 public class DetailsPresenter implements DetailsContract.Presenter {
 
+    private DetailsContract.Navigator navigator;
     private DetailsContract.View view;
     private BriteDatabase database;
     private Subscription subscription;
 
     @Inject
-    public DetailsPresenter(BriteDatabase database) {
+    public DetailsPresenter(DetailsContract.Navigator navigator, BriteDatabase database) {
+        this.navigator = navigator;
         this.database = database;
     }
 
@@ -60,6 +71,7 @@ public class DetailsPresenter implements DetailsContract.Presenter {
                             if (view != null) {
                                 view.showGalleryItem(galleryItem);
                             }
+                            loadLikesCount(galleryItem);
                         }
 
                     }, new Action1<Throwable>() {
@@ -71,5 +83,44 @@ public class DetailsPresenter implements DetailsContract.Presenter {
                         }
                     });
         }
+    }
+
+    private void loadLikesCount(final GalleryItem galleryItem) {
+        new GraphRequest(
+                AccessToken.getCurrentAccessToken(),
+                String.format(Locale.ROOT, "/%s?fields=likes.summary(true),comments.summary(true)", galleryItem.post_id()),
+                null,
+                HttpMethod.GET,
+                new GraphRequest.Callback() {
+                    public void onCompleted(GraphResponse response) {
+                        FacebookRequestError error = response.getError();
+                        if (error != null) {
+                            if (error.getErrorCode() == 100) {
+                                deletePostId(galleryItem);
+                                if (view != null) {
+                                    view.showToast("Post doesn't exist on Facebook");
+                                }
+                                navigator.finish();
+                            } else if (view != null) {
+                                view.showToast(error.getErrorUserMessage());
+                            }
+                        } else {
+                            FacebookResponse facebookResponse = new FacebookResponse(response.getRawResponse());
+                            if (view != null) {
+                                view.showCounters(facebookResponse.getLikesCount(), facebookResponse.getCommentsCount());
+                            }
+                        }
+                    }
+                }
+        ).executeAsync();
+    }
+
+    private void deletePostId(GalleryItem galleryItem) {
+        database.insert(GalleryItem.TABLE_NAME, GalleryItem.FACTORY.marshal()
+                        ._id(galleryItem._id())
+                        .path(galleryItem.path())
+                        .post_id(null)
+                        .asContentValues(),
+                SQLiteDatabase.CONFLICT_REPLACE);
     }
 }

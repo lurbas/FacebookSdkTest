@@ -8,6 +8,8 @@
     <string name="activity_login__title">Login</string>
 
     <string name="activity_details__title">Photo Details</string>
+    <string name="activity_details__likes">Likes</string>
+    <string name="activity_details__comments">Comments</string>
 
     <string name="dialog_agree">Yes</string>
     <string name="dialog_disagree">Cancel</string>

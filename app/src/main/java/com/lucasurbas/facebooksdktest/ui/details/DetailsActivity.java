@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.lucasurbas.facebooksdktest.R;
@@ -30,6 +31,8 @@ public class DetailsActivity extends BaseActivity implements DetailsContract.Vie
     private static final String KEY_ITEM_ID = "key_item_id";
 
     @BindView(R.id.activity_details__image) ImageView image;
+    @BindView(R.id.activity_details__likes_counter) TextView counterLikes;
+    @BindView(R.id.activity_details__comments_counter) TextView counterComments;
 
     @Inject DetailsContract.Presenter presenter;
 
@@ -83,5 +86,11 @@ public class DetailsActivity extends BaseActivity implements DetailsContract.Vie
     @Override
     public void showToast(String message) {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void showCounters(int likesCount, int commentsCount) {
+        counterLikes.setText(String.valueOf(likesCount));
+        counterComments.setText(String.valueOf(commentsCount));
     }
 }
