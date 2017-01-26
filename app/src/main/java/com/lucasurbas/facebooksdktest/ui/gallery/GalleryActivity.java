@@ -25,8 +25,8 @@ import com.lucasurbas.facebooksdktest.injection.app.ApplicationComponent;
 import com.lucasurbas.facebooksdktest.injection.gallery.DaggerGalleryComponent;
 import com.lucasurbas.facebooksdktest.injection.gallery.GalleryModule;
 import com.lucasurbas.facebooksdktest.model.GalleryItem;
-import com.lucasurbas.facebooksdktest.ui.util.BaseActivity;
-import com.lucasurbas.facebooksdktest.ui.util.ViewUtils;
+import com.lucasurbas.facebooksdktest.ui.utils.BaseActivity;
+import com.lucasurbas.facebooksdktest.ui.utils.ViewUtils;
 import com.tbruyelle.rxpermissions.RxPermissions;
 
 import java.util.Arrays;
@@ -79,6 +79,7 @@ public class GalleryActivity extends BaseActivity implements GalleryContract.Vie
         if (presenter.checkFacebookAccess()) {
             presenter.attachView(this);
             if (savedInstanceState != null) {
+                // Just to be sure in case Activity was destroyed when going to Camera App
                 presenter.restoreState(savedInstanceState.getBundle(KEY_PRESENTER_STATE));
             }
             presenter.loadGalleryItems();
@@ -88,11 +89,13 @@ public class GalleryActivity extends BaseActivity implements GalleryContract.Vie
     private void setupRecyclerView() {
         recyclerView.setHasFixedSize(true);
 
+        // temporally set 2 columns in grid view
         final GridLayoutManager layoutManager = new GridLayoutManager(this, 2);
         recyclerView.setLayoutManager(layoutManager);
         ViewUtils.onLaidOut(recyclerView, new Runnable() {
             @Override
             public void run() {
+                // set correct number of columns based on View width
                 int viewWidth = recyclerView.getMeasuredWidth();
                 float itemViewWidth = ViewUtils.convertDpToPixel(ITEM_WIDTH_DP, GalleryActivity.this);
                 int newSpanCount = (int) Math.floor(viewWidth / itemViewWidth);
@@ -101,6 +104,7 @@ public class GalleryActivity extends BaseActivity implements GalleryContract.Vie
             }
         });
         adapter = new GalleryItemsAdapter();
+        // Reactive way to handle list item clicks
         subscription = adapter.getItemClickObservable()
                 .subscribeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Action1<GalleryItem>() {
@@ -144,6 +148,7 @@ public class GalleryActivity extends BaseActivity implements GalleryContract.Vie
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
+        // Just to be sure in case Activity was destroyed when going to Camera App
         outState.putBundle(KEY_PRESENTER_STATE, presenter.saveState());
         super.onSaveInstanceState(outState);
     }
@@ -199,7 +204,6 @@ public class GalleryActivity extends BaseActivity implements GalleryContract.Vie
                     @Override
                     public void onSuccess(LoginResult loginResult) {
                         presenter.tryPublish(item);
-                        askForLocationPermission(item);
                     }
 
                     @Override

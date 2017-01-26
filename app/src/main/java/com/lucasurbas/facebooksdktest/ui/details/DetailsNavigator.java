@@ -1,5 +1,7 @@
 package com.lucasurbas.facebooksdktest.ui.details;
 
+import java.lang.ref.WeakReference;
+
 import javax.inject.Inject;
 
 /**
@@ -8,16 +10,16 @@ import javax.inject.Inject;
 
 public class DetailsNavigator implements DetailsContract.Navigator {
 
-    private DetailsActivity detailsActivity;
+    private WeakReference<DetailsActivity> detailsActivity;
 
     @Inject
     public DetailsNavigator(DetailsActivity detailsActivity) {
-        this.detailsActivity = detailsActivity;
+        this.detailsActivity = new WeakReference<>(detailsActivity);
     }
 
     @Override
     public void finish() {
-        detailsActivity.finish();
+        detailsActivity.get().finish();
     }
 
 }

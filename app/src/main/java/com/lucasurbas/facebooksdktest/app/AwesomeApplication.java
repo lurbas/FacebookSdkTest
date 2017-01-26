@@ -22,6 +22,7 @@ public class AwesomeApplication extends Application {
         super.onCreate();
         FacebookSdk.sdkInitialize(getApplicationContext());
 
+        // Dependency graph is build using Dagger2
         applicationComponent = DaggerApplicationComponent.builder()
                 .applicationModule(new ApplicationModule(this))
                 .dbModule(new DbModule())

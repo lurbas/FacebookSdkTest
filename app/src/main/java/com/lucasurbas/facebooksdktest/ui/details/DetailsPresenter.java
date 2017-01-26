@@ -50,6 +50,9 @@ public class DetailsPresenter implements DetailsContract.Presenter {
     @Override
     public void detachView() {
         this.view = null;
+        if (subscription != null && !subscription.isUnsubscribed()) {
+            subscription.unsubscribe();
+        }
     }
 
     @Override
@@ -57,6 +60,7 @@ public class DetailsPresenter implements DetailsContract.Presenter {
         if (subscription != null && !subscription.isUnsubscribed()) {
             subscription.unsubscribe();
         }
+        // Load GalleryItem from database based on passed Id
         QueryObservable queryObservable = database.createQuery(GalleryItem.TABLE_NAME, GalleryItem.SELECT_BY_ID, itemId);
         if (subscription == null || subscription.isUnsubscribed()) {
             subscription = queryObservable.mapToOne(new Func1<Cursor, GalleryItem>() {
@@ -97,16 +101,20 @@ public class DetailsPresenter implements DetailsContract.Presenter {
                     public void onCompleted(GraphResponse response) {
                         FacebookRequestError error = response.getError();
                         if (error != null) {
+                            // Case when user deleted photo from Facebook
                             if (error.getErrorCode() == 100) {
-                                deletePostId(galleryItem);
                                 if (view != null) {
                                     view.showToast("Post doesn't exist on Facebook");
                                 }
+                                // update item in database
+                                deletePostId(galleryItem);
+                                // and close the screen
                                 navigator.finish();
                             } else if (view != null) {
                                 view.showToast(error.getErrorUserMessage());
                             }
                         } else {
+                            // Parse response
                             FbPostDetailsResponse facebookResponse = gson.fromJson(response.getRawResponse(), FbPostDetailsResponse.class);
                             if (view != null) {
                                 view.showCounters(facebookResponse.getLikesCount(), facebookResponse.getCommentsCount());
@@ -118,6 +126,7 @@ public class DetailsPresenter implements DetailsContract.Presenter {
     }
 
     private void deletePostId(GalleryItem item) {
+        // When user deleted Facebook, update item in database
         database.update(GalleryItem.TABLE_NAME, GalleryItem.FACTORY.marshal()
                         .post_id(null)
                         .asContentValues(),

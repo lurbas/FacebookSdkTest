@@ -1,4 +1,4 @@
-package com.lucasurbas.facebooksdktest.ui.util;
+package com.lucasurbas.facebooksdktest.ui.utils;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;

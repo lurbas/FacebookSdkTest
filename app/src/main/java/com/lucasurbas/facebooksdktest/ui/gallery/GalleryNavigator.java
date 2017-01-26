@@ -12,6 +12,7 @@ import com.lucasurbas.facebooksdktest.ui.login.LoginActivity;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -24,12 +25,12 @@ import javax.inject.Inject;
 
 public class GalleryNavigator implements GalleryContract.Navigator {
 
-    private GalleryActivity galleryActivity;
+    private WeakReference<GalleryActivity> galleryActivity;
     private String currentPhotoPath;
 
     @Inject
     public GalleryNavigator(GalleryActivity galleryActivity) {
-        this.galleryActivity = galleryActivity;
+        this.galleryActivity = new WeakReference<>(galleryActivity);
     }
 
     @Override
@@ -40,25 +41,25 @@ public class GalleryNavigator implements GalleryContract.Navigator {
 
     @Override
     public void openGalleryItemDetails(String itemId) {
-        galleryActivity.startActivity(DetailsActivity.getIntent(galleryActivity, itemId));
+        galleryActivity.get().startActivity(DetailsActivity.getIntent(galleryActivity.get(), itemId));
     }
 
     @Override
     public void openLoginScreen() {
-        galleryActivity.startActivity(LoginActivity.getIntent(galleryActivity));
-        galleryActivity.overridePendingTransition(0, 0);
+        galleryActivity.get().startActivity(LoginActivity.getIntent(galleryActivity.get()));
+        galleryActivity.get().overridePendingTransition(0, 0);
     }
 
     @Override
     public void finish() {
-        galleryActivity.finish();
+        galleryActivity.get().finish();
     }
 
     private File createImageFile() throws IOException {
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.ROOT).format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
-        File storageDir = galleryActivity.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File storageDir = galleryActivity.get().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         File image = File.createTempFile(
                 imageFileName,  /* prefix */
                 ".jpg",         /* suffix */
@@ -73,7 +74,7 @@ public class GalleryNavigator implements GalleryContract.Navigator {
     private void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         // Ensure that there's a camera activity to handle the intent
-        if (takePictureIntent.resolveActivity(galleryActivity.getPackageManager()) != null) {
+        if (takePictureIntent.resolveActivity(galleryActivity.get().getPackageManager()) != null) {
             // Create the File where the photo should go
             File photoFile = null;
             try {
@@ -84,11 +85,11 @@ public class GalleryNavigator implements GalleryContract.Navigator {
             }
             // Continue only if the File was successfully created
             if (photoFile != null) {
-                Uri photoURI = FileProvider.getUriForFile(galleryActivity,
+                Uri photoURI = FileProvider.getUriForFile(galleryActivity.get(),
                         Constants.FILE_PROVIDER_AUTHORITY,
                         photoFile);
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                galleryActivity.startActivityForResult(takePictureIntent, Constants.REQUEST_TAKE_PHOTO);
+                galleryActivity.get().startActivityForResult(takePictureIntent, Constants.REQUEST_TAKE_PHOTO);
             }
         }
     }

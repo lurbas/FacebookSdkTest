@@ -9,6 +9,7 @@ import com.squareup.sqldelight.RowMapper;
  * Created by Lucas on 25/01/2017.
  */
 
+// SqlDelight is used for generating sql models (https://github.com/square/sqldelight)
 @AutoValue
 public abstract class GalleryItem implements GalleryItemModel {
 

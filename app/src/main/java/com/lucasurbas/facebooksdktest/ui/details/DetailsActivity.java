@@ -12,7 +12,7 @@ import com.lucasurbas.facebooksdktest.injection.app.ApplicationComponent;
 import com.lucasurbas.facebooksdktest.injection.details.DaggerDetailsComponent;
 import com.lucasurbas.facebooksdktest.injection.details.DetailsModule;
 import com.lucasurbas.facebooksdktest.model.GalleryItem;
-import com.lucasurbas.facebooksdktest.ui.util.BaseActivity;
+import com.lucasurbas.facebooksdktest.ui.utils.BaseActivity;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
@@ -76,6 +76,7 @@ public class DetailsActivity extends BaseActivity implements DetailsContract.Vie
 
     @Override
     public void showGalleryItem(GalleryItem item) {
+        // Load image from file
         File photoFile = new File(item.path());
         Picasso.with(this).load(photoFile)
                 .fit()

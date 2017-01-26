@@ -1,4 +1,4 @@
-package com.lucasurbas.facebooksdktest.ui.util;
+package com.lucasurbas.facebooksdktest.ui.utils;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -59,10 +59,9 @@ public class ViewUtils {
         });
     }
 
-    public static float convertDpToPixel(float dp, Context context){
+    public static float convertDpToPixel(float dp, Context context) {
         Resources resources = context.getResources();
         DisplayMetrics metrics = resources.getDisplayMetrics();
-        float px = dp * ((float)metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT);
-        return px;
+        return dp * ((float) metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT);
     }
 }

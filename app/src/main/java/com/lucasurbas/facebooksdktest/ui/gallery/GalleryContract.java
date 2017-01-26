@@ -3,9 +3,9 @@ package com.lucasurbas.facebooksdktest.ui.gallery;
 import android.os.Bundle;
 
 import com.lucasurbas.facebooksdktest.model.GalleryItem;
-import com.lucasurbas.facebooksdktest.ui.util.BaseNavigator;
-import com.lucasurbas.facebooksdktest.ui.util.BasePresenter;
-import com.lucasurbas.facebooksdktest.ui.util.BaseView;
+import com.lucasurbas.facebooksdktest.ui.utils.BaseNavigator;
+import com.lucasurbas.facebooksdktest.ui.utils.BasePresenter;
+import com.lucasurbas.facebooksdktest.ui.utils.BaseView;
 
 import java.util.List;
 
@@ -14,6 +14,8 @@ import java.util.List;
  */
 
 public interface GalleryContract {
+
+    // All public methods in Gallery module
 
     interface Navigator extends BaseNavigator {
 
@@ -41,7 +43,7 @@ public interface GalleryContract {
         void askForLocationPermission(GalleryItem item);
     }
 
-    interface Presenter extends BasePresenter<View> {
+    interface Presenter extends BasePresenter<GalleryContract.View> {
 
         Bundle saveState();
 
@@ -63,5 +65,4 @@ public interface GalleryContract {
 
         void logout();
     }
-
 }

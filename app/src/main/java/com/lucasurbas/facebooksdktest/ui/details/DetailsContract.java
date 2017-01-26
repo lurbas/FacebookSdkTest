@@ -1,8 +1,8 @@
 package com.lucasurbas.facebooksdktest.ui.details;
 
 import com.lucasurbas.facebooksdktest.model.GalleryItem;
-import com.lucasurbas.facebooksdktest.ui.util.BasePresenter;
-import com.lucasurbas.facebooksdktest.ui.util.BaseView;
+import com.lucasurbas.facebooksdktest.ui.utils.BasePresenter;
+import com.lucasurbas.facebooksdktest.ui.utils.BaseView;
 
 /**
  * Created by Lucas on 26/01/2017.
@@ -10,7 +10,10 @@ import com.lucasurbas.facebooksdktest.ui.util.BaseView;
 
 public interface DetailsContract {
 
+    // All public methods in PhotoDetails module
+
     interface Navigator {
+
         void finish();
     }
 

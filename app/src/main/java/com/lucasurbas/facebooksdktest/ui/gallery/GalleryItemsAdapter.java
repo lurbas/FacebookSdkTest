@@ -43,8 +43,10 @@ public class GalleryItemsAdapter extends RecyclerView.Adapter<GalleryItemsAdapte
         }
 
         public void setItem(GalleryItem item) {
-            File photoFile = new File(item.path());
+            // Show facebook icon next to image if already published
             shared.setVisibility(item.post_id() != null ? View.VISIBLE : View.GONE);
+            // Load image from file
+            File photoFile = new File(item.path());
             picasso.load(photoFile)
                     .fit()
                     .centerCrop()

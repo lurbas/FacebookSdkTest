@@ -24,7 +24,6 @@ import com.lucasurbas.facebooksdktest.model.GalleryItem;
 import com.squareup.sqlbrite.BriteDatabase;
 import com.squareup.sqlbrite.QueryObservable;
 
-import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -53,6 +52,7 @@ public class GalleryPresenter implements GalleryContract.Presenter {
 
     private static final String KEY_PHOTO_PATH = "key_photo_path";
     private static final int LOCATION_TIMEOUT_IN_SECONDS = 6;
+    private static final int IMAGE_SIZE_PX = 800;
 
     private GalleryContract.View view;
     private GalleryContract.Navigator navigator;
@@ -106,6 +106,7 @@ public class GalleryPresenter implements GalleryContract.Presenter {
         if (subscription != null && !subscription.isUnsubscribed()) {
             subscription.unsubscribe();
         }
+        //subscribe to database table and receive items every time table content changes
         QueryObservable queryObservable = database.createQuery(GalleryItem.TABLE_NAME, GalleryItem.SELECT_ALL);
         if (subscription == null || subscription.isUnsubscribed()) {
             subscription = queryObservable.mapToList(new Func1<Cursor, GalleryItem>() {
@@ -132,7 +133,7 @@ public class GalleryPresenter implements GalleryContract.Presenter {
                         @Override
                         public void call(Throwable throwable) {
                             if (view != null) {
-                                view.showToast("error");
+                                view.showToast("Error getting items from database");
                             }
                         }
                     });
@@ -162,6 +163,8 @@ public class GalleryPresenter implements GalleryContract.Presenter {
     }
 
     public void tryPublish(final GalleryItem item) {
+
+        //check required permissions, delegate showing proper dialogs to the view
         Set<String> permission = AccessToken.getCurrentAccessToken().getPermissions();
         if (view != null) {
             if (permission.contains(Constants.PUBLISH_PERMISSIONS)) {
@@ -177,20 +180,23 @@ public class GalleryPresenter implements GalleryContract.Presenter {
     )
     @Override
     public void publish(final GalleryItem item) {
+        // at this point we are sure all permissions (location and facebook publish) are granted
 
+        // first get location from LocationProvider
         LocationRequest req = LocationRequest.create()
                 .setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY)
                 .setNumUpdates(1)
                 .setExpirationDuration(TimeUnit.SECONDS.toMillis(LOCATION_TIMEOUT_IN_SECONDS))
                 .setFastestInterval(TimeUnit.SECONDS.toMillis(1))
                 .setInterval(100);
-
         locationProvider.getUpdatedLocation(req)
+                // timeout for location update
                 .timeout(LOCATION_TIMEOUT_IN_SECONDS, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
                 .first()
                 .flatMap(new Func1<Location, Observable<List<Address>>>() {
                     @Override
                     public Observable<List<Address>> call(Location location) {
+                        // next get address from Location using Geocoder class
                         return locationProvider
                                 .getReverseGeocodeObservable(location.getLatitude(), location.getLongitude(), 1);
                     }
@@ -200,6 +206,7 @@ public class GalleryPresenter implements GalleryContract.Presenter {
                 .subscribe(new Action1<List<Address>>() {
                     @Override
                     public void call(List<Address> addressList) {
+                        // if result not empty post on Facebook
                         if (!addressList.isEmpty()) {
                             Address address = addressList.get(0);
                             if (view != null) {
@@ -226,9 +233,9 @@ public class GalleryPresenter implements GalleryContract.Presenter {
                 }, new Action0() {
                     @Override
                     public void call() {
-//                        if (view != null) {
-//                            view.showToast("Completed");
-//                        }
+                         //if (view != null) {
+                         //    view.showToast("Completed");
+                         //}
                     }
                 });
     }
@@ -260,6 +267,7 @@ public class GalleryPresenter implements GalleryContract.Presenter {
                 if (view != null) {
                     view.showToast("Posted on Facebook!");
                 }
+                // Add postId to database
                 database.update(GalleryItem.TABLE_NAME, GalleryItem.FACTORY.marshal()
                                 .post_id(result.getPostId())
                                 .asContentValues(),
@@ -284,8 +292,8 @@ public class GalleryPresenter implements GalleryContract.Presenter {
 
     private Bitmap getBitmap(String path) {
         // Get the dimensions of the View
-        int targetW = 800;
-        int targetH = 800;
+        int targetW = IMAGE_SIZE_PX;
+        int targetH = IMAGE_SIZE_PX;
 
         // Get the dimensions of the bitmap
         BitmapFactory.Options bmOptions = new BitmapFactory.Options();
