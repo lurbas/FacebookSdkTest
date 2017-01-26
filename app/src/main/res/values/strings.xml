@@ -1,6 +1,4 @@
 <resources>
-    <string name="facebook_app_id">1742691006048335</string>
-
     <string name="app_name">Awesome!</string>
 
     <string name="activity_gallery__empty_state">No items.\nTake your first photo!</string>

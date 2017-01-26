@@ -1,6 +1,7 @@
 package com.lucasurbas.facebooksdktest.ui.gallery;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -45,6 +46,10 @@ public class GalleryActivity extends BaseActivity implements GalleryContract.Vie
 
     private GalleryItemsAdapter adapter;
     private Subscription subscription;
+
+    public static Intent getIntent(Context context) {
+        return new Intent(context, GalleryActivity.class);
+    }
 
     @Override
     protected void setupActivityComponent(ApplicationComponent applicationComponent) {
